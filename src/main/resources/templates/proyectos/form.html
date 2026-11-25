@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Formulario de proyecto')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="workspace">
+    <div th:replace="~{fragments/layout :: topbar}"></div>
+    <main class="content">
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+        <div class="page-head">
+            <div>
+                <h1 th:text="${edicion} ? 'Editar proyecto' : 'Registrar proyecto'">Registrar proyecto</h1>
+                <p>El alta atómica se ejecuta con <code>sp_tx_inicio_proyecto</code>.</p>
+            </div>
+            <a class="button button-ghost" th:href="@{/proyectos}">Volver al listado</a>
+        </div>
+
+        <form class="card stack" th:action="${edicion} ? @{/proyectos/{c}/editar(c=${form.codigo})} : @{/proyectos}"
+              th:object="${form}" method="post" novalidate>
+            <div class="form-grid">
+                <div class="field">
+                    <label for="codigo">Código del proyecto</label>
+                    <input id="codigo" type="text" th:field="*{codigo}" th:readonly="${edicion}"/>
+                    <small class="error" th:if="${#fields.hasErrors('codigo')}" th:errors="*{codigo}"></small>
+                </div>
+                <div class="field">
+                    <label for="acronimo">Acrónimo</label>
+                    <input id="acronimo" type="text" th:field="*{acronimo}"/>
+                    <small class="error" th:if="${#fields.hasErrors('acronimo')}" th:errors="*{acronimo}"></small>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="nombre">Nombre del proyecto</label>
+                <input id="nombre" type="text" th:field="*{nombre}"/>
+                <small class="error" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></small>
+            </div>
+
+            <div class="form-grid">
+                <div class="field">
+                    <label for="presupuesto">Presupuesto total</label>
+                    <input id="presupuesto" type="number" step="0.01" min="0" th:field="*{presupuesto}"/>
+                    <small class="error" th:if="${#fields.hasErrors('presupuesto')}" th:errors="*{presupuesto}"></small>
+                </div>
+                <div class="field">
+                    <label for="programa">Programa de idi</label>
+                    <input id="programa" type="text" th:field="*{programa}"/>
+                    <small class="error" th:if="${#fields.hasErrors('programa')}" th:errors="*{programa}"></small>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="field">
+                    <label for="idDirector">Director</label>
+                    <select id="idDirector" th:field="*{idDirector}">
+                        <option value="">Seleccione un director</option>
+                        <option th:each="d : ${directores}" th:value="${d['id_profesor']}"
+                                th:text="${d['nombre']}">Director</option>
+                    </select>
+                    <small class="error" th:if="${#fields.hasErrors('idDirector')}" th:errors="*{idDirector}"></small>
+                </div>
+                <div class="field" th:if="${!edicion}">
+                    <label for="idSubrogante">Subrogante</label>
+                    <select id="idSubrogante" th:field="*{idSubrogante}">
+                        <option value="">Sin subrogante</option>
+                        <option th:each="d : ${directores}" th:value="${d['id_profesor']}"
+                                th:text="${d['nombre']}">Subrogante</option>
+                    </select>
+                </div>
+                <div class="field" th:if="${!edicion}">
+                    <label for="codLinea">Línea de investigación</label>
+                    <select id="codLinea" th:field="*{codLinea}">
+                        <option value="">Seleccione una línea</option>
+                        <option th:each="l : ${lineas}" th:value="${l.codigo}"
+                                th:text="${l.nombre + ' · ' + l.dominio}">Línea</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="descripcion">Descripción</label>
+                <textarea id="descripcion" rows="4" th:field="*{descripcion}"></textarea>
+                <small class="error" th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}"></small>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="button button-primary">
+                    <i class="bi bi-save"></i> <span th:text="${edicion} ? 'Guardar cambios' : 'Registrar proyecto'">Guardar</span>
+                </button>
+                <a class="button button-ghost" th:href="@{/proyectos}">Cancelar</a>
+            </div>
+        </form>
+    </main>
+    <div th:replace="~{fragments/layout :: footer}"></div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

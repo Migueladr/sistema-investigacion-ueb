@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Reporte')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="workspace">
+    <div th:replace="~{fragments/layout :: topbar}"></div>
+    <main class="content">
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+        <div class="page-head"><div><h1 th:text="${definicion.titulo}">Reporte</h1>
+            <p th:text="${definicion.descripcion}">Descripción</p></div>
+            <div class="actions">
+                <a class="button button-ghost" th:href="@{/reportes}">Catálogo</a>
+                <a class="button button-primary" th:href="@{/api/reportes/{c}/csv(c=${definicion.codigo})}">
+                    <i class="bi bi-download"></i> Descargar CSV
+                </a>
+            </div>
+        </div>
+        <form class="card filters" th:action="@{/reportes/{c}(c=${definicion.codigo})}" method="get">
+            <input type="search" name="q" placeholder="Filtrar en cualquier columna" th:value="${q}"/>
+            <button type="submit" class="button button-primary">Filtrar</button>
+        </form>
+        <section class="card table-card">
+            <div class="card-head"><h2>Resultado</h2>
+                <span class="badge" th:text="${resultado.total} + ' fila(s)'">0</span></div>
+            <div class="table-responsive"><table class="table" id="tablaReporte">
+                <thead><tr th:each="col : ${resultado.columnas}"><th th:text="${col}">Columna</th></tr></thead>
+                <tbody>
+                <tr th:each="fila : ${resultado.filas}">
+                    <td th:each="col : ${resultado.columnas}" th:text="${fila[col]} ?: '—'">Valor</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(resultado.filas)}"><td th:colspan="${#lists.size(resultado.columnas)}" class="empty">El procedimiento no devolvió filas.</td></tr>
+                </tbody>
+            </table></div>
+            <div class="pagination">
+                <a th:if="${resultado.pagina > 1}" th:href="@{/reportes/{c}(c=${definicion.codigo},page=${resultado.pagina - 1},q=${q})}">← Anterior</a>
+                <span>Página <strong th:text="${resultado.pagina}">1</strong></span>
+                <a th:if="${resultado.total} > ${resultado.pagina} * ${resultado.tamanio}"
+                   th:href="@{/reportes/{c}(c=${definicion.codigo},page=${resultado.pagina + 1},q=${q})}">Siguiente →</a>
+            </div>
+        </section>
+    </main>
+    <div th:replace="~{fragments/layout :: footer}"></div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

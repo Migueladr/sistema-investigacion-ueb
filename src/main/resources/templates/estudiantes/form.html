@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Formulario de estudiante')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="workspace">
+    <div th:replace="~{fragments/layout :: topbar}"></div>
+    <main class="content">
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+        <div class="page-head"><div><h1 th:text="${edicion} ? 'Editar estudiante' : 'Registrar estudiante'">Estudiante</h1></div>
+            <a class="button button-ghost" th:href="@{/estudiantes}">Volver</a></div>
+        <form class="card stack" th:action="${edicion} ? @{/estudiantes/{id}/editar(id=${form.idEstudiante})} : @{/estudiantes}"
+              th:object="${form}" method="post" novalidate>
+            <div class="form-grid">
+                <div class="field">
+                    <label for="idEstudiante">Código de estudiante</label>
+                    <input id="idEstudiante" type="number" th:field="*{idEstudiante}" th:readonly="${edicion}"/>
+                    <small class="error" th:if="${#fields.hasErrors('idEstudiante')}" th:errors="*{idEstudiante}"></small>
+                </div>
+                <div class="field">
+                    <label for="cedula">Cédula (10 dígitos)</label>
+                    <input id="cedula" type="text" th:field="*{cedula}"/>
+                    <small class="error" th:if="${#fields.hasErrors('cedula')}" th:errors="*{cedula}"></small>
+                </div>
+            </div>
+            <div class="form-grid">
+                <div class="field">
+                    <label for="nombres">Nombres</label>
+                    <input id="nombres" type="text" th:field="*{nombres}"/>
+                    <small class="error" th:if="${#fields.hasErrors('nombres')}" th:errors="*{nombres}"></small>
+                </div>
+                <div class="field">
+                    <label for="apellidos">Apellidos</label>
+                    <input id="apellidos" type="text" th:field="*{apellidos}"/>
+                    <small class="error" th:if="${#fields.hasErrors('apellidos')}" th:errors="*{apellidos}"></small>
+                </div>
+            </div>
+            <div class="field">
+                <label for="carrera">Carrera</label>
+                <input id="carrera" type="text" th:field="*{carrera}"/>
+                <small class="error" th:if="${#fields.hasErrors('carrera')}" th:errors="*{carrera}"></small>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="button button-primary">Guardar</button>
+                <a class="button button-ghost" th:href="@{/estudiantes}">Cancelar</a>
+            </div>
+        </form>
+    </main>
+    <div th:replace="~{fragments/layout :: footer}"></div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

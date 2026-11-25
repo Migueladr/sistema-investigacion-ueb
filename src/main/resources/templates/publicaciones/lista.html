@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Publicaciones')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="workspace">
+    <div th:replace="~{fragments/layout :: topbar}"></div>
+    <main class="content">
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+        <div class="page-head">
+            <div><h1>Publicaciones</h1><p>Producción científica; los puntos son asignados por disparadores de la base de datos.</p></div>
+            <a class="button button-primary" th:href="@{/publicaciones/nuevo}"
+               th:if="${#strings.contains(rolesActuales, 'ADMIN') or #strings.contains(rolesActuales, 'SECRETARIA')}">Nueva publicación</a>
+        </div>
+        <form class="card filters" th:action="@{/publicaciones}" method="get">
+            <input type="search" name="q" placeholder="Título" th:value="${q}"/>
+            <select name="proyecto">
+                <option value="">Todos los proyectos</option>
+                <option th:each="p : ${proyectos}" th:value="${p.codigo}" th:text="${p.acronimo + ' · ' + p.nombre}"
+                        th:selected="${proyecto} == ${p.codigo}">Proyecto</option>
+            </select>
+            <select name="tipo">
+                <option value="">Todos los tipos</option>
+                <option th:each="t : ${T(com.example.backend.entity.TipoPublicacion).values()}"
+                        th:value="${t.name()}" th:text="${t.name()}" th:selected="${tipo} == ${t.name()}">Tipo</option>
+            </select>
+            <button type="submit" class="button button-primary">Buscar</button>
+            <a class="button button-ghost" th:href="@{/publicaciones}">Limpiar</a>
+        </form>
+        <section class="card table-card">
+            <div class="card-head"><h2>Listado</h2><span class="badge" th:text="${total} + ' registro(s)'">0</span></div>
+            <div class="table-responsive"><table class="table">
+                <thead><tr><th>Código</th><th>Título</th><th>Proyecto</th><th>Tipo</th><th>Autores</th><th>Puntos</th><th></th></tr></thead>
+                <tbody>
+                <tr th:each="p : ${publicaciones}">
+                    <td th:text="${p.codigo}">0</td>
+                    <td th:text="${p.titulo}">Título</td>
+                    <td><a th:href="@{/proyectos/{c}(c=${p.codProyecto})}" th:text="${p.proyecto}">Proyecto</a></td>
+                    <td><span class="badge badge-blue" th:text="${p.tipo}">Tipo</span></td>
+                    <td th:text="${p.autores} ?: '—'">Autores</td>
+                    <td><strong th:text="${p.puntos}">0</strong></td>
+                    <td class="actions">
+                        <a class="button button-sm" th:href="@{/publicaciones/{c}(c=${p.codigo})}">Ver</a>
+                        <a class="button button-sm button-ghost" th:href="@{/publicaciones/{c}/editar(c=${p.codigo})}"
+                           th:if="${#strings.contains(rolesActuales, 'ADMIN') or #strings.contains(rolesActuales, 'SECRETARIA')}">Editar</a>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(publicaciones)}"><td colspan="7" class="empty">No hay publicaciones para los filtros seleccionados.</td></tr>
+                </tbody>
+            </table></div>
+            <div class="pagination">
+                <a th:if="${pagina > 1}" th:href="@{/publicaciones(page=${pagina - 1},q=${q},tipo=${tipo},proyecto=${proyecto})}">← Anterior</a>
+                <span>Página <strong th:text="${pagina}">1</strong></span>
+                <a th:if="${total} > ${pagina} * 10" th:href="@{/publicaciones(page=${pagina + 1},q=${q},tipo=${tipo},proyecto=${proyecto})}">Siguiente →</a>
+            </div>
+        </section>
+    </main>
+    <div th:replace="~{fragments/layout :: footer}"></div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

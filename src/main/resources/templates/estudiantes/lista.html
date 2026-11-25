@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Estudiantes')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="workspace">
+    <div th:replace="~{fragments/layout :: topbar}"></div>
+    <main class="content">
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+        <div class="page-head">
+            <div><h1>Estudiantes</h1><p>Participantes del modelo relacional original.</p></div>
+            <a class="button button-primary" th:href="@{/estudiantes/nuevo}"
+               th:if="${#strings.contains(rolesActuales, 'ADMIN') or #strings.contains(rolesActuales, 'SECRETARIA')}">Nuevo estudiante</a>
+        </div>
+        <form class="card filters" th:action="@{/estudiantes}" method="get">
+            <input type="search" name="q" placeholder="Cédula, nombres, apellidos o carrera" th:value="${q}"/>
+            <button type="submit" class="button button-primary">Buscar</button>
+            <a class="button button-ghost" th:href="@{/estudiantes}">Limpiar</a>
+        </form>
+        <section class="card table-card">
+            <div class="card-head"><h2>Listado</h2><span class="badge" th:text="${total} + ' registro(s)'">0</span></div>
+            <div class="table-responsive"><table class="table">
+                <thead><tr><th>Código</th><th>Cédula</th><th>Estudiante</th><th>Carrera</th><th></th></tr></thead>
+                <tbody>
+                <tr th:each="e : ${estudiantes}">
+                    <td th:text="${e.id}">0</td>
+                    <td><code th:text="${e.cedulaEnmascarada()}">••••</code></td>
+                    <td th:text="${e.nombres + ' ' + e.apellidos}">Estudiante</td>
+                    <td th:text="${e.carrera}">Carrera</td>
+                    <td><a class="button button-sm" th:href="@{/estudiantes/{id}(id=${e.id})}">Ver</a></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(estudiantes)}"><td colspan="5" class="empty">No hay estudiantes para los filtros seleccionados.</td></tr>
+                </tbody>
+            </table></div>
+            <div class="pagination">
+                <a th:if="${pagina > 1}" th:href="@{/estudiantes(page=${pagina - 1},q=${q})}">← Anterior</a>
+                <span>Página <strong th:text="${pagina}">1</strong></span>
+                <a th:if="${total} > ${pagina} * 10" th:href="@{/estudiantes(page=${pagina + 1},q=${q})}">Siguiente →</a>
+            </div>
+        </section>
+    </main>
+    <div th:replace="~{fragments/layout :: footer}"></div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Ingreso')}"></head>
+<body class="login-body">
+<div class="login-card">
+    <div class="login-brand">
+        <span class="brand-mark">UEB</span>
+        <h1>Sistema de Gestión de Investigación</h1>
+        <p>Universidad Estatal de Bolívar</p>
+    </div>
+
+    <div class="alert alert-error" th:if="${param.error}">Usuario o contraseña incorrectos.</div>
+    <div class="alert alert-ok" th:if="${param.logout}">La sesión se cerró correctamente.</div>
+
+    <form th:action="@{/login}" method="post" class="stack">
+        <label for="username">Usuario</label>
+        <input id="username" name="username" type="text" autocomplete="username" required autofocus/>
+
+        <label for="password">Contraseña</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required/>
+
+        <button type="submit" class="button button-primary block">Ingresar</button>
+    </form>
+
+    <div class="login-hint">
+        <strong>Cuentas de desarrollo</strong>
+        <ul>
+            <li><code>admin</code> / <code>admin123</code> — ADMIN</li>
+            <li><code>secretaria</code> / <code>secretaria123</code> — SECRETARIA</li>
+            <li><code>carlos.mendoza</code> / <code>profesor123</code> — PROFESOR</li>
+            <li><code>pedro.gomez</code> / <code>estudiante123</code> — ESTUDIANTE</li>
+        </ul>
+        <small>Cambiar estas claves antes de usar el sistema en producción.</small>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

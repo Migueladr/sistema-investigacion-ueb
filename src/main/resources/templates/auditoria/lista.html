@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Auditoría')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="workspace">
+    <div th:replace="~{fragments/layout :: topbar}"></div>
+    <main class="content">
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+        <div class="page-head"><div><h1>Auditoría</h1>
+            <p>Consulta de solo lectura sobre los registros generados por triggers y procedimientos.</p></div></div>
+        <form class="card filters" th:action="@{/auditoria}" method="get">
+            <input type="text" name="operacion" placeholder="Operación (INSERT, UPDATE...)" th:value="${filtros.operacion}"/>
+            <input type="text" name="tabla" placeholder="Tabla o procedimiento" th:value="${filtros.tabla}"/>
+            <input type="text" name="usuario" placeholder="Usuario" th:value="${filtros.usuario}"/>
+            <input type="date" name="desde" th:value="${filtros.desde}" aria-label="Desde"/>
+            <input type="date" name="hasta" th:value="${filtros.hasta}" aria-label="Hasta"/>
+            <button type="submit" class="button button-primary">Filtrar</button>
+            <a class="button button-ghost" th:href="@{/auditoria}">Limpiar</a>
+        </form>
+        <section class="card table-card">
+            <div class="card-head"><h2>Cambios en datos (auditoria_cambios)</h2><span class="badge" th:text="${#lists.size(cambios)} + ' fila(s)'">0</span></div>
+            <div class="table-responsive"><table class="table">
+                <thead><tr><th>Fecha</th><th>Tabla</th><th>Operación</th><th>Clave</th><th>Anterior</th><th>Nuevo</th><th>Usuario BD</th></tr></thead>
+                <tbody>
+                <tr th:each="c : ${cambios}">
+                    <td th:text="${c['fecha_hora']}">Fecha</td>
+                    <td th:text="${c['tabla']}">Tabla</td>
+                    <td><span class="badge badge-blue" th:text="${c['operacion']}">Operación</span></td>
+                    <td th:text="${c['clave_registro']}">Clave</td>
+                    <td class="clip"><code th:text="${c['valores_anteriores']} ?: '—'">—</code></td>
+                    <td class="clip"><code th:text="${c['valores_nuevos']} ?: '—'">—</code></td>
+                    <td th:text="${c['usuario']}">Usuario</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(cambios)}"><td colspan="7" class="empty">Sin registros para los filtros seleccionados.</td></tr>
+                </tbody>
+            </table></div>
+        </section>
+        <section class="card table-card">
+            <div class="card-head"><h2>Operaciones atómicas (auditoria_operaciones)</h2><span class="badge" th:text="${#lists.size(operaciones)} + ' fila(s)'">0</span></div>
+            <div class="table-responsive"><table class="table">
+                <thead><tr><th>Fecha</th><th>Operación</th><th>Procedimiento</th><th>Resultado</th><th>Usuario BD</th></tr></thead>
+                <tbody>
+                <tr th:each="o : ${operaciones}">
+                    <td th:text="${o['fecha_registro']}">Fecha</td>
+                    <td th:text="${o['operacion']}">Operación</td>
+                    <td th:text="${o['procedimiento_ejecutado']}">Procedimiento</td>
+                    <td th:text="${o['resultado']}">Resultado</td>
+                    <td th:text="${o['usuario']} ?: '—'">Usuario</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(operaciones)}"><td colspan="5" class="empty">Sin registros para los filtros seleccionados.</td></tr>
+                </tbody>
+            </table></div>
+        </section>
+    </main>
+    <div th:replace="~{fragments/layout :: footer}"></div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

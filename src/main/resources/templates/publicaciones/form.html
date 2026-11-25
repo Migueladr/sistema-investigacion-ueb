@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Registrar publicación')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="workspace">
+    <div th:replace="~{fragments/layout :: topbar}"></div>
+    <main class="content">
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+        <div class="page-head">
+            <div><h1>Registrar publicación</h1><p>El tipo selecciona un Strategy distinto; los puntos los calcula la base de datos.</p></div>
+            <a class="button button-ghost" th:href="@{/publicaciones}">Volver</a>
+        </div>
+        <form class="card stack" th:action="@{/publicaciones}" th:object="${form}" method="post" id="formPublicacion" novalidate>
+            <div class="form-grid">
+                <div class="field">
+                    <label for="tipo">Tipo de publicación</label>
+                    <select th:field="*{tipo}">
+                        <option value="REVISTA">Revista</option>
+                        <option value="CONGRESO">Congreso</option>
+                        <option value="LIBRO">Libro</option>
+                        <option value="PATENTE">Patente</option>
+                    </select>
+                    <small class="error" th:if="${#fields.hasErrors('tipo')}" th:errors="*{tipo}"></small>
+                </div>
+                <div class="field">
+                    <label for="codProyecto">Proyecto</label>
+                    <select id="codProyecto" th:field="*{codProyecto}">
+                        <option value="">Seleccione un proyecto</option>
+                        <option th:each="p : ${proyectos}" th:value="${p.codigo}" th:text="${p.acronimo + ' · ' + p.nombre}">Proyecto</option>
+                    </select>
+                    <small class="error" th:if="${#fields.hasErrors('codProyecto')}" th:errors="*{codProyecto}"></small>
+                </div>
+            </div>
+            <div class="field">
+                <label for="titulo">Título</label>
+                <input id="titulo" type="text" th:field="*{titulo}"/>
+                <small class="error" th:if="${#fields.hasErrors('titulo')}" th:errors="*{titulo}"></small>
+            </div>
+            <div class="form-grid">
+                <div class="field">
+                    <label for="nombre">Nombre del medio o evento</label>
+                    <input id="nombre" type="text" th:field="*{nombre}"/>
+                </div>
+                <div class="field">
+                    <label for="idAutor">Autor principal</label>
+                    <select id="idAutor" th:field="*{idAutor}">
+                        <option value="">Seleccione un autor</option>
+                        <option th:each="i : ${investigadores}" th:value="${i.id}" th:text="${i.nombreCompleto}">Autor</option>
+                    </select>
+                    <small class="error" th:if="${#fields.hasErrors('idAutor')}" th:errors="*{idAutor}"></small>
+                </div>
+            </div>
+            <div class="field">
+                <label for="codLinea">Línea de investigación</label>
+                <select id="codLinea" th:field="*{codLinea}">
+                    <option value="">Seleccione una línea</option>
+                    <option th:each="l : ${lineas}" th:value="${l.codigo}" th:text="${l.nombre + ' · ' + l.dominio}">Línea</option>
+                </select>
+                <small class="error" th:if="${#fields.hasErrors('codLinea')}" th:errors="*{codLinea}"></small>
+            </div>
+
+            <fieldset class="fieldset" data-tipos="REVISTA">
+                <legend>Datos de revista</legend>
+                <div class="form-grid">
+                    <div class="field"><label for="editorial">Editorial</label><input id="editorial" type="text" th:field="*{editorial}"/></div>
+                    <div class="field"><label for="categoria">Categoría</label>
+                        <select id="categoria" th:field="*{categoria}"><option value="">Seleccione</option>
+                            <option value="ALTO_IMPACTO">Alto impacto</option><option value="REGIONAL">Regional</option></select>
+                        <small class="error" th:if="${#fields.hasErrors('categoria')}" th:errors="*{categoria}"></small>
+                    </div>
+                    <div class="field"><label for="cuartil">Cuartil</label>
+                        <select id="cuartil" th:field="*{cuartil}"><option value="">Seleccione</option>
+                            <option value="Q1">Q1</option><option value="Q2">Q2</option><option value="Q3">Q3</option>
+                            <option value="Q4">Q4</option><option value="Q5">Q5</option></select>
+                        <small class="error" th:if="${#fields.hasErrors('cuartil')}" th:errors="*{cuartil}"></small>
+                    </div>
+                    <div class="field"><label for="volumen">Volumen</label><input id="volumen" type="text" th:field="*{volumen}"/></div>
+                    <div class="field"><label for="numero">Número</label><input id="numero" type="text" th:field="*{numero}"/></div>
+                    <div class="field"><label for="pagInicio">Página inicio</label><input id="pagInicio" type="number" th:field="*{pagInicio}"/></div>
+                    <div class="field"><label for="pagFin">Página fin</label><input id="pagFin" type="number" th:field="*{pagFin}"/></div>
+                    <div class="field"><label for="alcance">Alcance</label><input id="alcance" type="text" th:field="*{alcance}"/></div>
+                </div>
+            </fieldset>
+
+            <fieldset class="fieldset" data-tipos="CONGRESO">
+                <legend>Datos de congreso</legend>
+                <div class="form-grid">
+                    <div class="field"><label for="tipoCongreso">Tipo de congreso</label>
+                        <input id="tipoCongreso" type="text" th:field="*{tipoCongreso}" placeholder="INTERNACIONAL, NACIONAL..."/></div>
+                    <div class="field"><label for="lugar">Lugar</label><input id="lugar" type="text" th:field="*{lugar}"/></div>
+                    <div class="field"><label for="pais">País</label><input id="pais" type="text" th:field="*{pais}"/></div>
+                    <div class="field"><label for="fechaInicio">Fecha inicio</label><input id="fechaInicio" type="date" th:field="*{fechaInicio}"/></div>
+                    <div class="field"><label for="fechaFin">Fecha fin</label><input id="fechaFin" type="date" th:field="*{fechaFin}"/></div>
+                    <div class="field"><label for="editorialActas">Editorial de actas</label><input id="editorialActas" type="text" th:field="*{editorialActas}"/></div>
+                </div>
+            </fieldset>
+
+            <fieldset class="fieldset" data-tipos="LIBRO">
+                <legend>Datos de libro</legend>
+                <div class="form-grid">
+                    <div class="field"><label for="editorialLibro">Editorial</label><input id="editorialLibro" type="text" name="editorial" th:value="*{editorial}"/></div>
+                    <div class="field"><label for="anioPublicacion">Año de publicación</label><input id="anioPublicacion" type="number" th:field="*{anioPublicacion}"/></div>
+                </div>
+            </fieldset>
+
+            <fieldset class="fieldset" data-tipos="PATENTE">
+                <legend>Datos de patente</legend>
+                <div class="form-grid">
+                    <div class="field"><label for="numPatente">Número de patente</label><input id="numPatente" type="text" th:field="*{numPatente}"/></div>
+                    <div class="field"><label for="fechaConcesion">Fecha de concesión</label><input id="fechaConcesion" type="date" th:field="*{fechaConcesion}"/></div>
+                </div>
+            </fieldset>
+
+            <div class="form-actions">
+                <button type="submit" class="button button-primary"><i class="bi bi-save"></i> Registrar publicación</button>
+                <a class="button button-ghost" th:href="@{/publicaciones}">Cancelar</a>
+            </div>
+        </form>
+    </main>
+    <div th:replace="~{fragments/layout :: footer}"></div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

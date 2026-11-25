@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Editar publicación')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="workspace">
+    <div th:replace="~{fragments/layout :: topbar}"></div>
+    <main class="content">
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+        <div class="page-head"><div><h1>Editar datos básicos</h1>
+            <p>El tipo y los puntos no se editan: los protegen los disparadores de la base de datos.</p></div>
+            <a class="button button-ghost" th:href="@{/publicaciones/{c}(c=${codigo})}">Volver</a></div>
+        <form class="card stack" th:action="@{/publicaciones/{c}/editar(c=${codigo})}" method="post">
+            <div class="field"><label for="titulo">Título</label><input id="titulo" name="titulo" th:value="${titulo}" required/></div>
+            <div class="field"><label for="nombre">Nombre del medio</label><input id="nombre" name="nombre" th:value="${nombre}"/></div>
+            <div class="form-actions">
+                <button type="submit" class="button button-primary">Guardar cambios</button>
+                <a class="button button-ghost" th:href="@{/publicaciones/{c}(c=${codigo})}">Cancelar</a>
+            </div>
+        </form>
+    </main>
+    <div th:replace="~{fragments/layout :: footer}"></div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Historial del proyecto')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="workspace">
+    <div th:replace="~{fragments/layout :: topbar}"></div>
+    <main class="content">
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+        <div class="page-head">
+            <div><h1>Historial de auditoría</h1><p th:text="${proyecto.codigo + ' · ' + proyecto.nombre}">Proyecto</p></div>
+            <a class="button button-ghost" th:href="@{/proyectos/{c}(c=${proyecto.codigo})}">Volver al proyecto</a>
+        </div>
+        <section class="card table-card">
+            <div class="card-head"><h2>Registros de auditoría</h2><span class="badge" th:text="${#lists.isEmpty(historial)} ? 'Sin registros' : 'Últimos 50'">0</span></div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead><tr><th>Fecha</th><th>Operación</th><th>Tabla / procedimiento</th><th>Detalle</th><th>Usuario BD</th></tr></thead>
+                    <tbody>
+                    <tr th:each="h : ${historial}">
+                        <td th:text="${h['fecha']}">Fecha</td>
+                        <td><span class="badge badge-blue" th:text="${h['tipo']}">Operación</span></td>
+                        <td th:text="${h['destino']}">Destino</td>
+                        <td class="clip"><code th:text="${h['detalle']}">Detalle</code></td>
+                        <td th:text="${h['usuario']}">Usuario</td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(historial)}"><td colspan="5" class="empty">No hay registros de auditoría para este proyecto.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+    <div th:replace="~{fragments/layout :: footer}"></div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

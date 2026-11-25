@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Equipo de línea')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="workspace">
+    <div th:replace="~{fragments/layout :: topbar}"></div>
+    <main class="content">
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+        <div class="page-head"><div><h1>Investigadores de la línea</h1><p th:text="'Código ' + ${codigo}">Código</p></div>
+            <a class="button button-ghost" th:href="@{/lineas}">Volver</a></div>
+        <section class="card table-card">
+            <div class="card-head"><h2>Equipo</h2></div>
+            <div class="table-responsive"><table class="table">
+                <thead><tr><th>Código</th><th>Investigador</th><th>Tipo</th><th></th></tr></thead>
+                <tbody>
+                <tr th:each="i : ${detalle['investigadores']}">
+                    <td th:text="${i['id_profesor']}">0</td>
+                    <td th:text="${i['investigador']}">Investigador</td>
+                    <td th:text="${i['tipo']}">Tipo</td>
+                    <td><a class="button button-sm" th:href="@{/investigadores/{id}(id=${i['id_profesor']})}">Ver</a></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(detalle['investigadores'])}"><td colspan="4" class="empty">Sin investigadores asociados.</td></tr>
+                </tbody>
+            </table></div>
+        </section>
+    </main>
+    <div th:replace="~{fragments/layout :: footer}"></div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

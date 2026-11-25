@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Dominios de conocimiento')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="workspace">
+    <div th:replace="~{fragments/layout :: topbar}"></div>
+    <main class="content">
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+        <div class="page-head"><div><h1>Dominios de conocimiento</h1>
+            <p>Jerarquía dominio → línea → proyecto con presupuesto vigente.</p></div></div>
+        <section class="grid-2">
+            <article class="card table-card">
+                <div class="card-head"><h2>Dominios</h2></div>
+                <div class="table-responsive"><table class="table">
+                    <thead><tr><th>Código</th><th>Dominio</th><th>Proyectos</th><th>Presupuesto vigente</th><th></th></tr></thead>
+                    <tbody>
+                    <tr th:each="d : ${vista['dominios']}" th:classappend="${seleccionado} == ${d.codigo} ? 'row-active' : ''">
+                        <td th:text="${d.codigo}">Código</td>
+                        <td th:text="${d.nombre}">Dominio</td>
+                        <td th:text="${d.proyectos}">0</td>
+                        <td th:text="${#numbers.formatDecimal(d.presupuestoVigente, 1, 'COMMA', 2, 'POINT')}">0</td>
+                        <td><a class="button button-sm" th:href="@{/dominios/{c}(c=${d.codigo})}">Ver</a></td>
+                    </tr>
+                    </tbody>
+                </table></div>
+            </article>
+            <article class="card table-card">
+                <div class="card-head"><h2>Líneas del dominio</h2>
+                    <a class="button button-sm button-ghost" th:href="@{/lineas(dominio=${seleccionado})}" th:if="${seleccionado}">Ver todas</a></div>
+                <div class="table-responsive"><table class="table">
+                    <thead><tr><th>Código</th><th>Línea</th><th>Dominio</th></tr></thead>
+                    <tbody>
+                    <tr th:each="l : ${vista['lineas']}">
+                        <td><a th:href="@{/lineas/{c}(c=${l.codigo})}" th:text="${l.codigo}">Código</a></td>
+                        <td th:text="${l.nombre}">Línea</td>
+                        <td th:text="${l.dominio}">Dominio</td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(vista['lineas'])}"><td colspan="3" class="empty">Seleccione un dominio.</td></tr>
+                    </tbody>
+                </table></div>
+            </article>
+        </section>
+        <section class="card table-card" th:if="${seleccionado}">
+            <div class="card-head"><h2>Proyectos del dominio</h2><span class="badge" th:text="${seleccionado}">Dominio</span></div>
+            <div class="table-responsive"><table class="table">
+                <thead><tr><th>Código</th><th>Proyecto</th><th>Presupuesto</th><th>Estado</th></tr></thead>
+                <tbody>
+                <tr th:each="p : ${vista['proyectos']}">
+                    <td><a th:href="@{/proyectos/{c}(c=${p['cod_proyecto']})}" th:text="${p['cod_proyecto']}">Código</a></td>
+                    <td th:text="${p['nombre_proyecto']}">Proyecto</td>
+                    <td th:text="${p['presupuesto_total']}">0</td>
+                    <td th:text="${p['estado']}">Estado</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(vista['proyectos'])}"><td colspan="4" class="empty">Sin proyectos para este dominio.</td></tr>
+                </tbody>
+            </table></div>
+        </section>
+        <section class="card">
+            <div class="card-head"><h2>Parámetros de puntaje</h2><span class="badge">sp_asignar_puntos</span></div>
+            <ul class="list" th:each="p : ${vista['puntajes']}">
+                <li><strong th:text="${p['clave']}">Clave</strong> · <span th:text="${p['descripcion']}">Descripción</span> · <b th:text="${p['puntos']}">0</b></li>
+            </ul>
+        </section>
+    </main>
+    <div th:replace="~{fragments/layout :: footer}"></div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

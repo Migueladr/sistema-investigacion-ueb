@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Líneas de investigación')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="workspace">
+    <div th:replace="~{fragments/layout :: topbar}"></div>
+    <main class="content">
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+        <div class="page-head"><div><h1>Líneas de investigación</h1><p>Relación con dominios y trabajos académicos.</p></div></div>
+        <form class="card filters" th:action="@{/lineas}" method="get">
+            <select name="dominio">
+                <option value="">Todos los dominios</option>
+                <option th:each="d : ${dominios}" th:value="${d.codigo}" th:text="${d.nombre}"
+                        th:selected="${seleccionado} == ${d.codigo}">Dominio</option>
+            </select>
+            <button type="submit" class="button button-primary">Filtrar</button>
+            <a class="button button-ghost" th:href="@{/lineas}">Limpiar</a>
+        </form>
+        <section class="card table-card">
+            <div class="card-head"><h2>Listado</h2><span class="badge" th:text="${#lists.size(lineas)} + ' línea(s)'">0</span></div>
+            <div class="table-responsive"><table class="table">
+                <thead><tr><th>Código</th><th>Línea</th><th>Dominio</th><th>Descripción</th><th></th></tr></thead>
+                <tbody>
+                <tr th:each="l : ${lineas}">
+                    <td th:text="${l.codigo}">Código</td>
+                    <td th:text="${l.nombre}">Línea</td>
+                    <td th:text="${l.dominio}">Dominio</td>
+                    <td th:text="${l.descripcion} ?: '—'">Descripción</td>
+                    <td><a class="button button-sm" th:href="@{/lineas/{c}(c=${l.codigo})}">Ver equipo</a></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(lineas)}"><td colspan="5" class="empty">No hay líneas para el dominio seleccionado.</td></tr>
+                </tbody>
+            </table></div>
+        </section>
+    </main>
+    <div th:replace="~{fragments/layout :: footer}"></div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

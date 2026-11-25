@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title th:text="${status} + ' | SIGI UEB'">Error | SIGI UEB</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}"/>
+</head>
+<body class="login-body">
+<div class="login-card center">
+    <i class="bi bi-exclamation-triangle big-icon"></i>
+    <h1 th:text="${status} ?: 'Error'">Error</h1>
+    <p th:text="${error} ?: 'No se pudo completar la solicitud.'">No se pudo completar la solicitud.</p>
+    <a class="button button-primary" th:href="@{/dashboard}">Volver al panel</a>
+</div>
+</body>
+</html>

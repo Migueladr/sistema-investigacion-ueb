@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Detalle de estudiante')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="workspace">
+    <div th:replace="~{fragments/layout :: topbar}"></div>
+    <main class="content">
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+        <div class="page-head">
+            <div><h1 th:text="${datos.estudiante.nombres + ' ' + datos.estudiante.apellidos}">Estudiante</h1>
+                <p th:text="${datos.estudiante.carrera + ' · Cédula ' + datos.estudiante.cedula}">Carrera</p></div>
+            <div class="actions">
+                <a class="button button-ghost" th:href="@{/estudiantes}">Volver</a>
+                <a class="button button-primary" th:href="@{/estudiantes/{id}/editar(id=${datos.estudiante.id})}"
+                   th:if="${#strings.contains(rolesActuales, 'ADMIN') or #strings.contains(rolesActuales, 'SECRETARIA')}">Editar</a>
+            </div>
+        </div>
+        <section class="card table-card">
+            <div class="card-head"><h2>Proyectos en los que participa</h2></div>
+            <div class="table-responsive"><table class="table">
+                <thead><tr><th>Proyecto</th><th>Inicio</th><th>Fin</th><th>Estado</th></tr></thead>
+                <tbody>
+                <tr th:each="p : ${datos.proyectos}">
+                    <td><a th:href="@{/proyectos/{c}(c=${p['cod_proyecto']})}" th:text="${p['nombre_proyecto']}">Proyecto</a></td>
+                    <td th:text="${p['fecha_inicio']}">Inicio</td>
+                    <td th:text="${p['fecha_fin']} ?: '—'">Fin</td>
+                    <td><span class="badge" th:classappend="${p['estado']} == 'VIGENTE' ? 'badge-green' : 'badge-amber'" th:text="${p['estado']}">Estado</span></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(datos.proyectos)}"><td colspan="4" class="empty">Sin participaciones registradas.</td></tr>
+                </tbody>
+            </table></div>
+        </section>
+    </main>
+    <div th:replace="~{fragments/layout :: footer}"></div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

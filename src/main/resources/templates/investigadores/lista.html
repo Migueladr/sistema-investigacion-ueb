@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Investigadores')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="workspace">
+    <div th:replace="~{fragments/layout :: topbar}"></div>
+    <main class="content">
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+        <div class="page-head">
+            <div><h1>Investigadores</h1><p>Carga académica obtenida de v_carga_investigadores.</p></div>
+            <a class="button button-primary" th:href="@{/investigadores/nuevo}"
+               th:if="${#strings.contains(rolesActuales, 'ADMIN') or #strings.contains(rolesActuales, 'SECRETARIA')}">Nuevo investigador</a>
+        </div>
+        <form class="card filters" th:action="@{/investigadores}" method="get">
+            <input type="search" name="q" placeholder="Nombres o apellidos" th:value="${q}"/>
+            <select name="tipo">
+                <option value="">Todos los tipos</option>
+                <option value="DOCTOR" th:selected="${tipo} == 'DOCTOR'">Doctor</option>
+                <option value="NO_DOCTOR" th:selected="${tipo} == 'NO_DOCTOR'">No doctor</option>
+            </select>
+            <button type="submit" class="button button-primary">Buscar</button>
+            <a class="button button-ghost" th:href="@{/investigadores}">Limpiar</a>
+        </form>
+        <section class="card table-card">
+            <div class="card-head"><h2>Listado</h2><span class="badge" th:text="${total} + ' registro(s)'">0</span></div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead><tr><th>Código</th><th>Investigador</th><th>Tipo</th><th>Despacho</th><th>Teléfono</th><th>Proyectos</th><th>Direcciones</th><th></th></tr></thead>
+                    <tbody>
+                    <tr th:each="i : ${investigadores}">
+                        <td th:text="${i.id}">0</td>
+                        <td th:text="${i.nombreCompleto}">Nombre</td>
+                        <td><span class="badge" th:classappend="${i.esDoctor()} ? 'badge-green' : 'badge-amber'" th:text="${i.tipo}">Tipo</span></td>
+                        <td th:text="${i.despacho} ?: '—'">Despacho</td>
+                        <td th:text="${i.telefono} ?: '—'">Teléfono</td>
+                        <td th:text="${i.proyectosInvestigador}">0</td>
+                        <td th:text="${i.proyectosDirector}">0</td>
+                        <td class="actions"><a class="button button-sm" th:href="@{/investigadores/{id}(id=${i.id})}">Ver</a></td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(investigadores)}"><td colspan="8" class="empty">No hay investigadores para los filtros seleccionados.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <a th:if="${pagina > 1}" th:href="@{/investigadores(page=${pagina - 1},q=${q},tipo=${tipo})}">← Anterior</a>
+                <span>Página <strong th:text="${pagina}">1</strong></span>
+                <a th:if="${total} > ${pagina} * 10" th:href="@{/investigadores(page=${pagina + 1},q=${q},tipo=${tipo})}">Siguiente →</a>
+            </div>
+        </section>
+    </main>
+    <div th:replace="~{fragments/layout :: footer}"></div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

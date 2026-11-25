@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Detalle de investigador')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="workspace">
+    <div th:replace="~{fragments/layout :: topbar}"></div>
+    <main class="content">
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+        <div class="page-head">
+            <div>
+                <h1 th:text="${datos.investigador.nombreCompleto}">Investigador</h1>
+                <p th:text="'Código ' + ${datos.investigador.id} + ' · ' + ${datos.investigador.tipo}">Datos</p>
+            </div>
+            <div class="actions">
+                <a class="button button-ghost" th:href="@{/investigadores}">Volver</a>
+                <a class="button button-primary" th:href="@{/investigadores/{id}/editar(id=${datos.investigador.id})}"
+                   th:if="${#strings.contains(rolesActuales, 'ADMIN') or #strings.contains(rolesActuales, 'SECRETARIA')}">Editar</a>
+            </div>
+        </div>
+
+        <section class="grid-4">
+            <article class="card metric"><small>Proyectos como investigador</small><strong th:text="${datos.investigador.proyectosInvestigador}">0</strong></article>
+            <article class="card metric"><small>Proyectos como director</small><strong th:text="${datos.investigador.proyectosDirector}">0</strong></article>
+            <article class="card metric"><small>Publicaciones</small><strong th:text="${#lists.size(datos.publicaciones)}">0</strong></article>
+            <article class="card metric"><small>Líneas de trabajo</small><strong th:text="${#lists.size(datos.lineas)}">0</strong></article>
+        </section>
+
+        <section class="grid-2">
+            <article class="card table-card">
+                <div class="card-head"><h2>Proyectos vigentes</h2></div>
+                <div class="table-responsive"><table class="table">
+                    <thead><tr><th>Proyecto</th><th>Rol</th><th>Inicio</th><th>Fin</th></tr></thead>
+                    <tbody>
+                    <tr th:each="p : ${datos.proyectos}">
+                        <td><a th:href="@{/proyectos/{c}(c=${p['cod_proyecto']})}" th:text="${p['acronimo']}">Proyecto</a></td>
+                        <td><span class="badge badge-blue" th:text="${p['rol']}">Rol</span></td>
+                        <td th:text="${p['fecha_inicio']}">Inicio</td>
+                        <td th:text="${p['fecha_fin']} ?: '—'">Fin</td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(datos.proyectos)}"><td colspan="4" class="empty">Sin proyectos vigentes.</td></tr>
+                    </tbody>
+                </table></div>
+            </article>
+            <article class="card table-card">
+                <div class="card-head"><h2>Publicaciones</h2></div>
+                <div class="table-responsive"><table class="table">
+                    <thead><tr><th>Título</th><th>Tipo</th><th>Línea</th><th>Puntos</th></tr></thead>
+                    <tbody>
+                    <tr th:each="p : ${datos.publicaciones}">
+                        <td th:text="${p['titulo']}">Título</td>
+                        <td th:text="${p['tipo']}">Tipo</td>
+                        <td th:text="${p['nombre_linea']}">Línea</td>
+                        <td th:text="${p['puntos_asignados']}">0</td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(datos.publicaciones)}"><td colspan="4" class="empty">Sin publicaciones.</td></tr>
+                    </tbody>
+                </table></div>
+            </article>
+        </section>
+
+        <section class="grid-2">
+            <article class="card">
+                <div class="card-head"><h2>Líneas de investigación</h2></div>
+                <ul class="list" th:each="l : ${datos.lineas}">
+                    <li><strong th:text="${l['nombre_linea']}">Línea</strong> · <span th:text="${l['nom_dominio']}">Dominio</span></li>
+                </ul>
+                <p class="empty" th:if="${#lists.isEmpty(datos.lineas)}">Sin líneas asociadas.</p>
+            </article>
+            <article class="card">
+                <div class="card-head"><h2>Supervisión</h2></div>
+                <h3>Supervisores</h3>
+                <ul class="list" th:each="s : ${datos.supervisores}">
+                    <li th:text="${s['nombre']} + ' (' + ${s['fecha_inicio']} + ')'">Supervisor</li>
+                </ul>
+                <h3>Supervisados</h3>
+                <ul class="list" th:each="s : ${datos.supervisados}">
+                    <li th:text="${s['nombre']} + ' (' + ${s['fecha_inicio']} + ')'">Supervisado</li>
+                </ul>
+            </article>
+        </section>
+
+        <section class="card table-card">
+            <div class="card-head"><h2>Historial de participación</h2></div>
+            <div class="table-responsive"><table class="table">
+                <thead><tr><th>Proyecto</th><th>Rol</th><th>Inicio</th><th>Fin</th><th>Estado</th></tr></thead>
+                <tbody>
+                <tr th:each="h : ${datos.historial}">
+                    <td><a th:href="@{/proyectos/{c}(c=${h['cod_proyecto']})}" th:text="${h['acronimo']}">Proyecto</a></td>
+                    <td th:text="${h['rol']}">Rol</td>
+                    <td th:text="${h['fecha_inicio']}">Inicio</td>
+                    <td th:text="${h['fecha_fin']} ?: '—'">Fin</td>
+                    <td><span class="badge" th:classappend="${h['estado']} == 'VIGENTE' ? 'badge-green' : 'badge-amber'" th:text="${h['estado']}">Estado</span></td>
+                </tr>
+                </tbody>
+            </table></div>
+        </section>
+    </main>
+    <div th:replace="~{fragments/layout :: footer}"></div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

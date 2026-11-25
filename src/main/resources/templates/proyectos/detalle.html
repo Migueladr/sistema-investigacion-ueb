@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Detalle de proyecto')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="workspace">
+    <div th:replace="~{fragments/layout :: topbar}"></div>
+    <main class="content">
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+        <div class="page-head">
+            <div>
+                <h1 th:text="${detalle.proyecto.nombre}">Proyecto</h1>
+                <p>
+                    <span class="badge badge-blue" th:text="${detalle.proyecto.codigo}">Código</span>
+                    <span class="badge" th:classappend="${detalle.proyecto.estado} == 'VIGENTE' ? 'badge-green' : 'badge-amber'"
+                          th:text="${detalle.proyecto.estado}">Estado</span>
+                    <span th:text="${detalle.proyecto.director}">Director</span>
+                </p>
+            </div>
+            <div class="actions">
+                <a class="button button-ghost" th:href="@{/proyectos}">Volver</a>
+                <a class="button button-ghost" th:href="@{/proyectos/{c}/historial(c=${detalle.proyecto.codigo})}">Historial</a>
+                <a class="button button-primary" th:href="@{/proyectos/{c}/editar(c=${detalle.proyecto.codigo})}"
+                   th:if="${#strings.contains(rolesActuales, 'ADMIN') or #strings.contains(rolesActuales, 'SECRETARIA')}">Editar</a>
+            </div>
+        </div>
+
+        <section class="grid-4">
+            <article class="card metric"><small>Presupuesto</small><strong th:text="${#numbers.formatDecimal(detalle.proyecto.presupuesto, 1, 'COMMA', 2, 'POINT')}">0</strong></article>
+            <article class="card metric"><small>Investigadores vigentes</small><strong th:text="${detalle.proyecto.investigadoresVigentes}">0</strong></article>
+            <article class="card metric"><small>Publicaciones</small><strong th:text="${detalle.proyecto.publicaciones}">0</strong></article>
+            <article class="card metric"><small>Puntaje total</small><strong th:text="${detalle.proyecto.puntajeTotal}">0</strong></article>
+        </section>
+
+        <section class="card" th:if="${detalle.proyecto.descripcion}">
+            <h2>Descripción</h2>
+            <p class="muted" th:text="${detalle.proyecto.descripcion}">Descripción</p>
+        </section>
+
+        <div th:if="${#strings.contains(rolesActuales, 'ADMIN') or #strings.contains(rolesActuales, 'SECRETARIA')}" class="grid-2">
+            <form class="card stack" th:action="@{/proyectos/{c}/lineas(c=${detalle.proyecto.codigo})}" method="post">
+                <h3>Asociar línea de investigación</h3>
+                <select name="codLinea" required>
+                    <option value="">Seleccione una línea</option>
+                    <option th:each="l : ${lineas}" th:value="${l.codigo}" th:text="${l.nombre + ' · ' + l.dominio}">Línea</option>
+                </select>
+                <button type="submit" class="button button-primary">Asociar</button>
+            </form>
+            <form class="card stack" th:action="@{/proyectos/{c}/investigadores(c=${detalle.proyecto.codigo})}" method="post">
+                <h3>Asignar investigador</h3>
+                <select name="id" required>
+                    <option value="">Seleccione un investigador</option>
+                    <option th:each="i : ${investigadores}" th:value="${i['id_profesor']}" th:text="${i['nombre']}">Investigador</option>
+                </select>
+                <select name="rol">
+                    <option value="INVESTIGADOR">Investigador</option>
+                    <option value="SUBROGANTE">Subrogante</option>
+                    <option value="COLABORADOR">Colaborador</option>
+                </select>
+                <button type="submit" class="button button-primary">Asignar</button>
+            </form>
+            <form class="card stack" th:action="@{/proyectos/{c}/estudiantes(c=${detalle.proyecto.codigo})}" method="post">
+                <h3>Asignar estudiante</h3>
+                <select name="id" required>
+                    <option value="">Seleccione un estudiante</option>
+                    <option th:each="e : ${estudiantes}" th:value="${e.id}" th:text="${e.nombres + ' ' + e.apellidos}">Estudiante</option>
+                </select>
+                <input type="date" name="fechaInicio" aria-label="Fecha de inicio"/>
+                <button type="submit" class="button button-primary">Asignar</button>
+            </form>
+            <div class="card stack">
+                <h3>Operaciones atómicas</h3>
+                <p class="muted">Estas acciones invocan procedimientos con transacción y auditoría propias.</p>
+                <form th:action="@{/proyectos/{c}/director(c=${detalle.proyecto.codigo})}" method="post">
+                    <button type="submit" class="button button-ghost block" data-confirm="¿El subrogante debe asumir la dirección?">Asumir subrogante</button>
+                </form>
+                <form th:action="@{/proyectos/{c}/cerrar(c=${detalle.proyecto.codigo})}" method="post">
+                    <button type="submit" class="button button-danger block" data-confirm="¿Cerrar el proyecto y todas sus participaciones?">Cerrar proyecto</button>
+                </form>
+            </div>
+        </div>
+
+        <section class="card table-card">
+            <div class="card-head"><h2>Líneas y equipos</h2></div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead><tr><th>Línea</th><th>Dominio</th><th>Investigadores</th><th>Rol</th><th>Estado</th><th></th></tr></thead>
+                    <tbody>
+                    <tr th:each="l : ${detalle.lineas}">
+                        <td th:text="${l['nombre_linea']}">Línea</td>
+                        <td th:text="${l['nom_dominio']}">Dominio</td>
+                        <td colspan="3" class="muted">Asociada al proyecto</td>
+                        <td></td>
+                    </tr>
+                    <tr th:each="i : ${detalle.integrantes}">
+                        <td th:text="${i['investigador']}">Investigador</td>
+                        <td th:text="${i['tipo']}">Tipo</td>
+                        <td th:text="${i['fecha_inicio']}">Inicio</td>
+                        <td th:text="${i['rol']}">Rol</td>
+                        <td><span class="badge" th:classappend="${i['estado']} == 'VIGENTE' ? 'badge-green' : 'badge-amber'" th:text="${i['estado']}">Estado</span></td>
+                        <td th:if="${#strings.contains(rolesActuales, 'ADMIN') or #strings.contains(rolesActuales, 'SECRETARIA')}">
+                            <form th:action="@{/proyectos/{c}/investigadores/{id}/fin(c=${detalle.proyecto.codigo},id=${i['id_profesor']})}" method="post">
+                                <button type="submit" class="button button-sm button-ghost" th:if="${i['estado']} == 'VIGENTE'">Finalizar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="card table-card">
+            <div class="card-head"><h2>Estudiantes participantes</h2></div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead><tr><th>Estudiante</th><th>Carrera</th><th>Inicio</th><th>Fin</th><th>Estado</th><th></th></tr></thead>
+                    <tbody>
+                    <tr th:each="e : ${detalle.estudiantes}">
+                        <td th:text="${e['estudiante']}">Estudiante</td>
+                        <td th:text="${e['carrera']}">Carrera</td>
+                        <td th:text="${e['fecha_inicio']}">Inicio</td>
+                        <td th:text="${e['fecha_fin']} ?: '—'">Fin</td>
+                        <td><span class="badge" th:classappend="${e['estado']} == 'VIGENTE' ? 'badge-green' : 'badge-amber'" th:text="${e['estado']}">Estado</span></td>
+                        <td th:if="${#strings.contains(rolesActuales, 'ADMIN') or #strings.contains(rolesActuales, 'SECRETARIA')}">
+                            <form th:action="@{/proyectos/{c}/estudiantes/{id}/fin(c=${detalle.proyecto.codigo},id=${e['id_estudiante']})}" method="post">
+                                <button type="submit" class="button button-sm button-ghost" th:if="${e['estado']} == 'VIGENTE'">Finalizar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(detalle.estudiantes)}"><td colspan="6" class="empty">Sin estudiantes asignados.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="card table-card">
+            <div class="card-head"><h2>Producción científica</h2></div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead><tr><th>Código</th><th>Título</th><th>Tipo</th><th>Medio</th><th>Puntos</th></tr></thead>
+                    <tbody>
+                    <tr th:each="p : ${detalle.publicaciones}">
+                        <td th:text="${p['cod_publicacion']}">0</td>
+                        <td th:text="${p['titulo']}">Título</td>
+                        <td><span class="badge badge-blue" th:text="${p['tipo']}">Tipo</span></td>
+                        <td th:text="${p['nombre']} ?: '—'">Medio</td>
+                        <td th:text="${p['puntos_asignados']}">0</td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(detalle.publicaciones)}"><td colspan="5" class="empty">Sin publicaciones registradas.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+    <div th:replace="~{fragments/layout :: footer}"></div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Dashboard')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="workspace">
+    <div th:replace="~{fragments/layout :: topbar}"></div>
+    <main class="content">
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+
+        <div class="page-head">
+            <div>
+                <h1>Panel de control</h1>
+                <p>Indicadores calculados en tiempo real sobre la base de datos institucional.</p>
+            </div>
+            <a class="button button-primary" th:href="@{/proyectos/nuevo}" th:if="${#strings.contains(rolesActuales, 'ADMIN')}">Nuevo proyecto</a>
+        </div>
+
+        <section class="cards">
+            <article class="card metric">
+                <span class="metric-icon blue"><i class="bi bi-diagram-3"></i></span>
+                <div><small>Total de proyectos</small><strong th:text="${datos.totalProyectos}">0</strong></div>
+            </article>
+            <article class="card metric">
+                <span class="metric-icon green"><i class="bi bi-activity"></i></span>
+                <div><small>Proyectos vigentes</small><strong th:text="${datos.vigentes}">0</strong></div>
+            </article>
+            <article class="card metric">
+                <span class="metric-icon amber"><i class="bi bi-check2-square"></i></span>
+                <div><small>Proyectos finalizados</small><strong th:text="${datos.finalizados}">0</strong></div>
+            </article>
+            <article class="card metric">
+                <span class="metric-icon violet"><i class="bi bi-people"></i></span>
+                <div><small>Investigadores</small><strong th:text="${datos.investigadores}">0</strong></div>
+            </article>
+            <article class="card metric">
+                <span class="metric-icon cyan"><i class="bi bi-mortarboard"></i></span>
+                <div><small>Estudiantes activos</small><strong th:text="${datos.estudiantes}">0</strong></div>
+            </article>
+            <article class="card metric">
+                <span class="metric-icon rose"><i class="bi bi-journal-text"></i></span>
+                <div><small>Publicaciones</small><strong th:text="${datos.publicaciones}">0</strong></div>
+            </article>
+        </section>
+
+        <section class="grid-2">
+            <article class="card">
+                <div class="card-head"><h2>Presupuesto vigente</h2><span class="badge">USD</span></div>
+                <p class="big-number" th:text="${#numbers.formatDecimal(datos.presupuestoVigente, 1, 'COMMA', 2, 'POINT')}">0.00</p>
+                <p class="muted">Suma de los proyectos con fecha de fin posterior a la fecha actual.</p>
+                <div class="divider"></div>
+                <h3>Distribución por dominio</h3>
+                <div th:each="d : ${datos.presupuestoPorDominio}" class="bar-row">
+                    <div class="bar-label"><span th:text="${d['nom_dominio']}">Dominio</span><small th:text="${d['porcentaje_del_total']} + '%'">0%</small></div>
+                    <div class="bar"><span th:style="'width:' + (${d['porcentaje_del_total']} ?: 0) + '%'"></span></div>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="card-head"><h2>Estado de proyectos</h2></div>
+                <div th:each="e : ${datos.porEstado}" class="bar-row">
+                    <div class="bar-label"><span th:text="${e['estado']}">Estado</span><strong th:text="${e['total']}">0</strong></div>
+                    <div class="bar"><span th:style="'width:' + ((${datos.totalProyectos} > 0 ? (${e['total']} * 100 / ${datos.totalProyectos}) : 0)) + '%'"></span></div>
+                </div>
+                <div class="divider"></div>
+                <h3>Publicaciones por tipo</h3>
+                <div th:each="t : ${datos.publicacionesPorTipo}" class="bar-row">
+                    <div class="bar-label"><span th:text="${t['tipo']}">Tipo</span><strong th:text="${t['total']}">0</strong></div>
+                    <div class="bar bar-alt"><span th:style="'width:' + ((${datos.publicaciones} > 0 ? (${t['total']} * 100 / ${datos.publicaciones}) : 0)) + '%'"></span></div>
+                </div>
+            </article>
+        </section>
+
+        <section class="grid-2" th:if="${misProyectos != null and !#maps.isEmpty(misProyectos)}">
+            <article class="card">
+                <div class="card-head"><h2>Mis proyectos</h2></div>
+                <table class="table">
+                    <thead><tr><th>Código</th><th>Proyecto</th><th>Inicio</th></tr></thead>
+                    <tbody>
+                    <tr th:each="p : ${misProyectos}">
+                        <td><a th:href="@{/proyectos/{c}(c=${p['cod_proyecto']})}" th:text="${p['cod_proyecto']}">Código</a></td>
+                        <td th:text="${p['nombre_proyecto']}">Proyecto</td>
+                        <td th:text="${p['fecha_inicio']}">Fecha</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </article>
+        </section>
+
+        <section class="card" th:if="${avisos != null and !#lists.isEmpty(avisos)}">
+            <div class="card-head"><h2>Actividad reciente del sistema</h2></div>
+            <ul class="timeline">
+                <li th:each="a : ${avisos}">
+                    <span class="dot"></span>
+                    <div><strong th:text="${a.descripcion}">Evento</strong><small th:text="${a.fecha}">Fecha</small></div>
+                </li>
+            </ul>
+        </section>
+    </main>
+    <div th:replace="~{fragments/layout :: footer}"></div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

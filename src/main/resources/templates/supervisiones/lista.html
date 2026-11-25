@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Supervisiones')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="workspace">
+    <div th:replace="~{fragments/layout :: topbar}"></div>
+    <main class="content">
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+        <div class="page-head"><div><h1>Supervisiones</h1>
+            <p>La regla de negocio la valida <code>sp_validar_supervision</code> desde un disparador.</p></div></div>
+        <div class="grid-2">
+            <form class="card stack" th:action="@{/supervisiones}" method="post">
+                <h2>Registrar supervisión</h2>
+                <div class="field"><label for="idDoctor">Doctor supervisor</label>
+                    <select id="idDoctor" name="idDoctor" required>
+                        <option value="">Seleccione</option>
+                        <option th:each="d : ${catalogos['doctores']}" th:value="${d['id_profesor']}" th:text="${d['nombre']}">Doctor</option>
+                    </select></div>
+                <div class="field"><label for="idNoDoctor">Investigador supervisado</label>
+                    <select id="idNoDoctor" name="idNoDoctor" required>
+                        <option value="">Seleccione</option>
+                        <option th:each="n : ${catalogos['noDoctores']}" th:value="${n['id_profesor']}" th:text="${n['nombre']}">No doctor</option>
+                    </select></div>
+                <div class="form-grid">
+                    <div class="field"><label for="fechaInicio">Fecha inicio</label><input id="fechaInicio" name="fechaInicio" type="date" required/></div>
+                    <div class="field"><label for="fechaFin">Fecha fin</label><input id="fechaFin" name="fechaFin" type="date"/></div>
+                </div>
+                <button type="submit" class="button button-primary">Registrar</button>
+            </form>
+            <form class="card filters" th:action="@{/supervisiones}" method="get">
+                <input type="search" name="q" placeholder="Nombre del supervisor o supervisado" th:value="${q}"/>
+                <label class="check"><input type="checkbox" name="vigentes" value="true" th:checked="${vigentes}"/> Solo vigentes</label>
+                <button type="submit" class="button button-primary">Buscar</button>
+            </form>
+        </div>
+        <section class="card table-card">
+            <div class="card-head"><h2>Supervisiones</h2></div>
+            <div class="table-responsive"><table class="table">
+                <thead><tr><th>Supervisor</th><th>Supervisado</th><th>Inicio</th><th>Fin</th><th>Estado</th><th></th></tr></thead>
+                <tbody>
+                <tr th:each="s : ${supervisiones}">
+                    <td th:text="${s.doctor}">Doctor</td>
+                    <td th:text="${s.noDoctor}">No doctor</td>
+                    <td th:text="${s.fechaInicio}">Inicio</td>
+                    <td th:text="${s.fechaFin} ?: '—'">Fin</td>
+                    <td><span class="badge" th:classappend="${s.vigente} ? 'badge-green' : 'badge-amber'"
+                              th:text="${s.vigente} ? 'VIGENTE' : 'FINALIZADA'">Estado</span></td>
+                    <td>
+                        <form th:action="@{/supervisiones/finalizar}" method="post" th:if="${s.vigente}">
+                            <input type="hidden" name="doctor" th:value="${s.idDoctor}"/>
+                            <input type="hidden" name="noDoctor" th:value="${s.idNoDoctor}"/>
+                            <input type="hidden" name="fechaInicio" th:value="${s.fechaInicio}"/>
+                            <input type="date" name="fechaFin" required aria-label="Fecha de fin"/>
+                            <button type="submit" class="button button-sm button-ghost">Finalizar</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(supervisiones)}"><td colspan="6" class="empty">No hay supervisiones para los filtros seleccionados.</td></tr>
+                </tbody>
+            </table></div>
+        </section>
+        <section class="card table-card">
+            <div class="card-head"><h2>Auditoría de supervisa</h2></div>
+            <div class="table-responsive"><table class="table">
+                <thead><tr><th>Fecha</th><th>Operación</th><th>Clave</th><th>Detalle</th><th>Usuario BD</th></tr></thead>
+                <tbody>
+                <tr th:each="h : ${historial}">
+                    <td th:text="${h['fecha']}">Fecha</td><td th:text="${h['tipo']}">Operación</td>
+                    <td th:text="${h['clave']}">Clave</td><td class="clip"><code th:text="${h['detalle']}">Detalle</code></td>
+                    <td th:text="${h['usuario']}">Usuario</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(historial)}"><td colspan="5" class="empty">Sin registros de auditoría.</td></tr>
+                </tbody>
+            </table></div>
+        </section>
+    </main>
+    <div th:replace="~{fragments/layout :: footer}"></div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

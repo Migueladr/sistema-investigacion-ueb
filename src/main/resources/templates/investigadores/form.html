@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Formulario de investigador')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="workspace">
+    <div th:replace="~{fragments/layout :: topbar}"></div>
+    <main class="content">
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+        <div class="page-head">
+            <div><h1 th:text="${edicion} ? 'Editar investigador' : 'Registrar investigador'">Investigador</h1>
+                <p>El trigger de alta crea el registro en <code>doctor</code> o <code>no_doctor</code>.</p></div>
+            <a class="button button-ghost" th:href="@{/investigadores}">Volver</a>
+        </div>
+        <form class="card stack" th:action="${edicion} ? @{/investigadores/{id}/editar(id=${form.idProfesor})} : @{/investigadores}"
+              th:object="${form}" method="post" novalidate>
+            <div class="form-grid">
+                <div class="field">
+                    <label for="idProfesor">Código de profesor</label>
+                    <input id="idProfesor" type="number" th:field="*{idProfesor}" th:readonly="${edicion}"/>
+                    <small class="error" th:if="${#fields.hasErrors('idProfesor')}" th:errors="*{idProfesor}"></small>
+                </div>
+                <div class="field">
+                    <label for="tipo">Tipo</label>
+                    <select id="tipo" th:field="*{tipo}" th:disabled="${edicion}">
+                        <option value="">Seleccione</option>
+                        <option value="DOCTOR">Doctor</option>
+                        <option value="NO_DOCTOR">No doctor</option>
+                    </select>
+                    <input th:if="${edicion}" type="hidden" name="tipo" th:value="*{tipo}"/>
+                    <small class="muted" th:if="${edicion}">El tipo no se puede cambiar (trg_investigador_bu).</small>
+                    <small class="error" th:if="${#fields.hasErrors('tipo')}" th:errors="*{tipo}"></small>
+                </div>
+            </div>
+            <div class="form-grid">
+                <div class="field">
+                    <label for="nombres">Nombres</label>
+                    <input id="nombres" type="text" th:field="*{nombres}"/>
+                    <small class="error" th:if="${#fields.hasErrors('nombres')}" th:errors="*{nombres}"></small>
+                </div>
+                <div class="field">
+                    <label for="apellidos">Apellidos</label>
+                    <input id="apellidos" type="text" th:field="*{apellidos}"/>
+                    <small class="error" th:if="${#fields.hasErrors('apellidos')}" th:errors="*{apellidos}"></small>
+                </div>
+            </div>
+            <div class="form-grid">
+                <div class="field">
+                    <label for="despacho">Despacho</label>
+                    <input id="despacho" type="text" th:field="*{despacho}"/>
+                </div>
+                <div class="field">
+                    <label for="telefono">Teléfono</label>
+                    <input id="telefono" type="text" th:field="*{telefono}"/>
+                    <small class="error" th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}"></small>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="button button-primary">Guardar</button>
+                <a class="button button-ghost" th:href="@{/investigadores}">Cancelar</a>
+            </div>
+        </form>
+    </main>
+    <div th:replace="~{fragments/layout :: footer}"></div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

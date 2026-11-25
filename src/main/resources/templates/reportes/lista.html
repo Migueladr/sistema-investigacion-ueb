@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Reportes')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="workspace">
+    <div th:replace="~{fragments/layout :: topbar}"></div>
+    <main class="content">
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+        <div class="page-head"><div><h1>Reportes académicos</h1>
+            <p>Diez procedimientos de agregación del modelo original, ejecutados sin lógica duplicada en Java.</p></div></div>
+        <section class="grid-3">
+            <a class="card report-card" th:each="r : ${reportes}" th:href="@{/reportes/{c}(c=${r.codigo})}">
+                <span class="badge badge-blue" th:text="${r.codigo}">Código</span>
+                <h2 th:text="${r.titulo}">Reporte</h2>
+                <p th:text="${r.descripcion}">Descripción</p>
+                <small th:text="${r.procedimiento}">sp_...</small>
+            </a>
+        </section>
+    </main>
+    <div th:replace="~{fragments/layout :: footer}"></div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

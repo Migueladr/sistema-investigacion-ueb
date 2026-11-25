@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Detalle de publicación')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="workspace">
+    <div th:replace="~{fragments/layout :: topbar}"></div>
+    <main class="content">
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+        <div class="page-head">
+            <div><h1 th:text="${datos.publicacion.titulo}">Publicación</h1>
+                <p><span class="badge badge-blue" th:text="${datos.publicacion.tipo}">Tipo</span>
+                    <span th:text="'Código ' + ${datos.publicacion.codigo}">Código</span></p></div>
+            <div class="actions">
+                <a class="button button-ghost" th:href="@{/publicaciones}">Volver</a>
+                <a class="button button-primary" th:href="@{/publicaciones/{c}/editar(c=${datos.publicacion.codigo})}"
+                   th:if="${#strings.contains(rolesActuales, 'ADMIN') or #strings.contains(rolesActuales, 'SECRETARIA')}">Editar datos básicos</a>
+            </div>
+        </div>
+        <section class="grid-4">
+            <article class="card metric"><small>Proyecto</small><strong><a th:href="@{/proyectos/{c}(c=${datos.publicacion.codProyecto})}" th:text="${datos.publicacion.proyecto}">Proyecto</a></strong></article>
+            <article class="card metric"><small>Medio</small><strong th:text="${datos.publicacion.nombre} ?: '—'">Medio</strong></article>
+            <article class="card metric"><small>Puntos asignados</small><strong th:text="${datos.publicacion.puntos}">0</strong></article>
+            <article class="card metric"><small>Autores</small><strong th:text="${#lists.size(datos.autores)}">0</strong></article>
+        </section>
+        <section class="grid-2">
+            <article class="card">
+                <div class="card-head"><h2>Detalle específico</h2></div>
+                <dl class="detail-list">
+                    <div th:each="c : ${datos.campos}"><dt th:text="${c.etiqueta}">Campo</dt><dd th:text="${c.valor}">Valor</dd></div>
+                </dl>
+            </article>
+            <article class="card">
+                <div class="card-head"><h2>Autores y líneas</h2></div>
+                <ul class="list" th:each="a : ${datos.autores}">
+                    <li><strong th:text="${a['autor']}">Autor</strong> · <span th:text="${a['nombre_linea']}">Línea</span></li>
+                </ul>
+            </article>
+        </section>
+    </main>
+    <div th:replace="~{fragments/layout :: footer}"></div>
+</div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
